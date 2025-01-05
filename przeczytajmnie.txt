@@ -3,4 +3,4 @@
 
 Aby stronka poprawnie działała, należy cały folder "ai_project" przenieść do folderu htdocs w XAMPP'ie.
 
-Poprawna ścieżka do strony internetowej sklepu: localhost/ai_project/main.php
+Poprawna ścieżka do strony internetowej: localhost/ai_project/main.php
