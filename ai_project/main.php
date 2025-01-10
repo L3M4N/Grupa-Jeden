@@ -11,7 +11,7 @@
 <body>
     <div id="header-container">
         <div id="logo">
-            <img src="imgs/logo.jpg" alt="Logo">
+            <img src="imgs/logo-zut.svg" alt="Logo ZUT">
         </div>
         <div id="title">Plan ZUT</div>
         <div id="theme-switcher">
@@ -34,19 +34,39 @@
     </div>
     <div id="container">
         <div id="input-container">
-            <input type="text" placeholder="Indeks"/>
-            <input type="text" placeholder="Wykładowca"/>
-            <input type="text" placeholder="Grupa"/>
-            <input type="text" placeholder="Sala"/>
-            <input type="text" placeholder="Przedmiot"/>
-            <input type="text" placeholder="Budynek"/>
-        </div>
-        <div id="calendar-container">
-            <div id="calendar">
-
+            <div class="input-group">
+                <label for="indeks">Indeks:</label>
+                <input type="text" id="indeks" placeholder="Indeks"/>
+            </div>
+            <div class="input-group">
+                <label for="wykladowca">Wykładowca:</label>
+                <input type="text" id="wykladowca" placeholder="Wykładowca"/>
+            </div>
+            <div class="input-group">
+                <label for="grupa">Grupa:</label>
+                <input type="text" id="grupa" placeholder="Grupa"/>
+            </div>
+            <div class="input-group">
+                <label for="sala">Sala:</label>
+                <input type="text" id="sala" placeholder="Sala"/>
+            </div>
+            <div class="input-group">
+                <label for="przedmiot">Przedmiot:</label>
+                <input type="text" id="przedmiot" placeholder="Przedmiot"/>
+            </div>
+            <div id="button-container">
+                <button type="button" title="Wyszukaj">Szukaj</button>
+                <button type="button" title="Wyczyść filtry">Wyczyść</button>
+                <button type="button" title="Zapisz do ulubionych">
+                    <i class="bi bi-floppy-fill"></i>
+                </button>
             </div>
         </div>
+        <div id="calendar-container">
+            <div id="calendar"></div>
+        </div>
     </div>
-<script src="src.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

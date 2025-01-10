@@ -11,10 +11,16 @@ const switchTheme = (isDark: boolean) => {
         body.classList.remove('dark');
         logoDark.src = 'imgs/logo.jpg';
     }
+
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
 };
+
+const savedTheme = localStorage.getItem('theme');
+const isDarkMode = savedTheme === 'dark';
+
+switchTheme(isDarkMode);
+themeToggle.checked = isDarkMode;
 
 themeToggle.addEventListener('change', () => {
     switchTheme(themeToggle.checked);
 });
-
-switchTheme(false);
