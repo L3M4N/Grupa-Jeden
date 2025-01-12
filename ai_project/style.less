@@ -116,8 +116,20 @@ body {
       font-size: 1.75rem;
     }
   }
-
+  @media (width < 1500px) {
+    #logo img {
+      object-fit: contain;
+    }
+  }
   @media (width < 1000px) {
+    #logo {
+        flex: 1;
+        justify-content: center;
+      img {
+        content: url('imgs/logo-small.png');
+        width: 7.5vh;
+      }
+    }
     #theme-switcher {
       margin-right: 15px;
 
@@ -182,6 +194,7 @@ body {
 
       button {
         font-size: 1rem;
+        font-weight: bold;
         color: white;
         border: 1px solid black;
         border-radius: 10px;
@@ -236,6 +249,7 @@ body {
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       padding: 15px;
       overflow: auto;
+      scrollbar-color: darkgray #fff;
     }
 
     .fc-daygrid-day {
@@ -277,8 +291,10 @@ body {
       }
     }
   }
-  @media (width < 900px) {
-
+  @media (width < 750px) {
+    #calendar-container {
+      width: calc(100vh - 20%)
+    }
   }
 }
 
@@ -321,7 +337,7 @@ body.dark {
   #container {
     #input-container {
       input {
-        color: white;
+        color: @color-dark ;
         background-color: lighten(@primary-bg-dark, 10%);
         border-color: darken(@primary-bg, 10%);
 
@@ -344,23 +360,31 @@ body.dark {
     #calendar-container {
       #calendar {
         background-color: lighten(@primary-bg-dark, 15%);
-        border: none;
+        border-color: lighten(@primary-bg-dark, 15%);
+        scrollbar-color: lighten(black, 20%) gray;
       }
       .fc-timegrid-slot {
-        background-color: lighten(@primary-bg-dark, 30%);
         border-color: gray;
       }
       button, .fc-col-header-cell{
         color: @color-dark;
       }
-      .fc-timegrid-axis {
-        background-color: lighten(@primary-bg-dark, 30%);
-      }
-      .fc-daygrid-day {
+      .fc-timegrid-axis, .fc-daygrid-day, .fc-timegrid-slot {
         background-color: lighten(@primary-bg-dark, 30%);
       }
       h2 {
         color: @color-dark;
+      }
+      .fc-event {
+        background-color: darken(rgb(55,136,217),10%);
+        border: none;
+      }
+      .fc-scrollgrid {
+        border: 1px solid gray;
+        color: @color-dark;
+      }
+      th {
+        border: 1px solid lighten(@primary-bg-dark, 30%);
       }
     }
   }

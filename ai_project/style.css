@@ -95,7 +95,20 @@ body {
 #header-container #save-fav .fav-icon {
   font-size: 1.75rem;
 }
+@media (width < 1500px) {
+  #header-container #logo img {
+    object-fit: contain;
+  }
+}
 @media (width < 1000px) {
+  #header-container #logo {
+    flex: 1;
+    justify-content: center;
+  }
+  #header-container #logo img {
+    content: url('imgs/logo-small.png');
+    width: 7.5vh;
+  }
   #header-container #theme-switcher {
     margin-right: 15px;
   }
@@ -153,6 +166,7 @@ body {
 }
 #container #input-container #button-container button {
   font-size: 1rem;
+  font-weight: bold;
   color: white;
   border: 1px solid black;
   border-radius: 10px;
@@ -202,6 +216,7 @@ body {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   padding: 15px;
   overflow: auto;
+  scrollbar-color: darkgray #fff;
 }
 #container #calendar-container .fc-daygrid-day {
   border: 1px solid #ddd;
@@ -236,6 +251,11 @@ body {
     width: 100vh;
   }
 }
+@media (width < 750px) {
+  #container #calendar-container {
+    width: calc(100vh - 20%);
+  }
+}
 body.dark {
   background-color: #1f1f1f;
   color: black;
@@ -265,7 +285,7 @@ body.dark #header-container #save-fav .fav-icon {
   color: #cccccc;
 }
 body.dark #container #input-container input {
-  color: white;
+  color: #cccccc;
   background-color: #393939;
   border-color: #223175;
 }
@@ -284,23 +304,33 @@ body.dark #container #input-container #button-container button:first-child {
 }
 body.dark #container #calendar-container #calendar {
   background-color: #454545;
-  border: none;
+  border-color: #454545;
+  scrollbar-color: #333333 gray;
 }
 body.dark #container #calendar-container .fc-timegrid-slot {
-  background-color: #6c6c6c;
   border-color: gray;
 }
 body.dark #container #calendar-container button,
 body.dark #container #calendar-container .fc-col-header-cell {
   color: #cccccc;
 }
-body.dark #container #calendar-container .fc-timegrid-axis {
-  background-color: #6c6c6c;
-}
-body.dark #container #calendar-container .fc-daygrid-day {
+body.dark #container #calendar-container .fc-timegrid-axis,
+body.dark #container #calendar-container .fc-daygrid-day,
+body.dark #container #calendar-container .fc-timegrid-slot {
   background-color: #6c6c6c;
 }
 body.dark #container #calendar-container h2 {
   color: #cccccc;
+}
+body.dark #container #calendar-container .fc-event {
+  background-color: #236eba;
+  border: none;
+}
+body.dark #container #calendar-container .fc-scrollgrid {
+  border: 1px solid gray;
+  color: #cccccc;
+}
+body.dark #container #calendar-container th {
+  border: 1px solid #6c6c6c;
 }
 /*# sourceMappingURL=style.css.map */
