@@ -40,23 +40,28 @@
             </div>
             <div class="input-group">
                 <label for="wykladowca">Wykładowca:</label>
-                <input type="text" id="wykladowca" placeholder="Wykładowca"/>
+                <input type="text" name="wykladowca" placeholder="Wykładowca"/>
             </div>
             <div class="input-group">
                 <label for="grupa">Grupa:</label>
-                <input type="text" id="grupa" placeholder="Grupa"/>
+                <input type="text" name="grupa" placeholder="Grupa"/>
             </div>
             <div class="input-group">
                 <label for="sala">Sala:</label>
-                <input type="text" id="sala" placeholder="Sala"/>
+                <!--<input type="text" id="sala" placeholder="Sala"/>-->
+               <input type="text" name="sala" placeholder="Sala">
+
             </div>
             <div class="input-group">
                 <label for="przedmiot">Przedmiot:</label>
-                <input type="text" id="przedmiot" placeholder="Przedmiot"/>
+                <input type="text" name="przedmiot" placeholder="Przedmiot"/>
             </div>
             <div id="button-container">
-                <button type="button" title="Wyszukaj">Szukaj</button>
-                <button type="button" title="Wyczyść filtry">Wyczyść</button>
+                <!--<button type="button" title="Wyszukaj">Szukaj</button>-->
+                 <button id="search-button">Szukaj</button>
+
+                <button id="clear-button" title="Wyczyść filtry">Wyczyść</button>
+
                 <button type="button" title="Zapisz do ulubionych">
                     <i class="bi bi-floppy-fill"></i>
                 </button>
@@ -65,6 +70,7 @@
         <div id="calendar-container">
             <div id="calendar"></div>
         </div>
+        <div id="table-container"></div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
     <script src="script.js"></script>
