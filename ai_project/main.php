@@ -9,70 +9,100 @@
     <link rel="icon" href="imgs/page-logo.png">
 </head>
 <body>
-    <div id="header-container">
-        <div id="logo">
-            <img src="imgs/logo-zut.svg" alt="Logo ZUT">
-        </div>
-        <div id="title">Plan ZUT</div>
-        <div id="theme-switcher">
+<div id="header-container">
+    <div id="logo">
+        <img src="imgs/logo-zut.svg" alt="Logo ZUT">
+    </div>
+    <div id="title">Plan ZUT</div>
+    <div id="theme-switcher">
             <span class="theme-icon" title="Light Mode">
                 <i class="bi bi-brightness-high-fill"></i>
             </span>
-            <label class="switch">
-                <input type="checkbox" id="theme-toggle">
-                <span class="slider round"></span>
-            </label>
-            <span class="theme-icon" title="Dark Mode">
+        <label class="switch">
+            <input type="checkbox" id="theme-toggle">
+            <span class="slider round"></span>
+        </label>
+        <span class="theme-icon" title="Dark Mode">
                 <i class="bi bi-moon-fill"></i>
             </span>
-        </div>
-        <div id="save-fav">
+    </div>
+    <div id="save-fav">
             <span class="fav-icon" title="Favourites">
                 <i class="bi bi-heart-fill"></i>
             </span>
+    </div>
+</div>
+<div id="container">
+    <div id="input-container">
+        <div class="input-group">
+            <label for="indeks">Indeks:</label>
+            <input type="text" name="indeks" placeholder="Indeks">
+        </div>
+        <div class="input-group">
+            <label for="wykladowca">Wykładowca:</label>
+            <input type="text" name="wykladowca" placeholder="Wykładowca"/>
+        </div>
+        <div class="input-group">
+            <label for="grupa">Grupa:</label>
+            <input type="text" name="grupa" placeholder="Grupa"/>
+        </div>
+        <div class="input-group">
+            <label for="sala">Sala:</label>
+            <input type="text" name="sala" placeholder="Sala">
+        </div>
+        <div class="input-group">
+            <label for="przedmiot">Przedmiot:</label>
+            <input type="text" name="przedmiot" placeholder="Przedmiot"/>
+        </div>
+        <div id="button-container">
+            <button id="search-button">Szukaj</button>
+            <button id="clear-button" title="Wyczyść filtry">Wyczyść</button>
+            <button type="button" title="Zapisz do ulubionych">
+                <i class="bi bi-floppy-fill"></i>
+            </button>
         </div>
     </div>
-    <div id="container">
-        <div id="input-container">
-            <div class="input-group">
-                <label for="indeks">Indeks:</label>
-                <input type="text" id="indeks" placeholder="Indeks"/>
-            </div>
-            <div class="input-group">
-                <label for="wykladowca">Wykładowca:</label>
-                <input type="text" name="wykladowca" placeholder="Wykładowca"/>
-            </div>
-            <div class="input-group">
-                <label for="grupa">Grupa:</label>
-                <input type="text" name="grupa" placeholder="Grupa"/>
-            </div>
-            <div class="input-group">
-                <label for="sala">Sala:</label>
-                <!--<input type="text" id="sala" placeholder="Sala"/>-->
-               <input type="text" name="sala" placeholder="Sala">
-
-            </div>
-            <div class="input-group">
-                <label for="przedmiot">Przedmiot:</label>
-                <input type="text" name="przedmiot" placeholder="Przedmiot"/>
-            </div>
-            <div id="button-container">
-                <!--<button type="button" title="Wyszukaj">Szukaj</button>-->
-                 <button id="search-button">Szukaj</button>
-
-                <button id="clear-button" title="Wyczyść filtry">Wyczyść</button>
-
-                <button type="button" title="Zapisz do ulubionych">
-                    <i class="bi bi-floppy-fill"></i>
-                </button>
+    <div id="calendar-container">
+        <div class="given-range-container">
+            <div id="date">
+                <label for="start-date">Od:</label>
+                <input type="date" id="start-date">
+                <label for="end-date">Do:</label>
+                <input type="date" id="end-date">
+                <button id="apply-dates" class="given-btn2">Zatwierdź</button>
             </div>
         </div>
-        <div id="calendar-container">
-            <div id="calendar"></div>
+        <div id="calendar"></div>
+        <div class="calendar-legend">
+            <div class="legend-item">
+                <span class="legend-color" style="background-color: #FF5733;"></span>
+                <span class="legend-label">Wykład</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background-color: #33FF57;"></span>
+                <span class="legend-label">Audytoria</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background-color: #3357FF;"></span>
+                <span class="legend-label">Laboratorium</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background-color: #F3FF33;"></span>
+                <span class="legend-label">Lektorat</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background-color: #FF33A8;"></span>
+                <span class="legend-label">Projekt</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background-color: #0000FF;"></span>
+                <span class="legend-label">Egzamin</span>
+            </div>
         </div>
-        <div id="table-container"></div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
-    <script src="script.js"></script>
+    <div id="table-container"></div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
