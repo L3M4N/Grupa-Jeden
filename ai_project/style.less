@@ -58,9 +58,8 @@ body {
     .switch {
       position: relative;
       display: inline-block;
-      //width: 70px;
-      width: clamp(62px, 4.4rem, 78px);
-      height: clamp(28px, 2.2rem, 40px);
+      width: 4.4rem;
+      height: 2.2rem;
 
       input {
         opacity: 0;
@@ -134,7 +133,7 @@ body {
       margin-right: 15px;
 
       .theme-icon {
-        font-size: 1.25rem;
+        font-size: calc(1.5rem - 15%);
       }
     }
 
@@ -143,6 +142,49 @@ body {
       .fav-icon {
         font-size: 1.5rem;
       }
+    }
+  }
+  @media (width < 750px) {
+    #logo {
+      flex: 0.75;
+      padding: 0 5px 0 5px;
+    }
+    #theme-switcher {
+      .theme-icon {
+        font-size: calc(1.5rem - 25%);
+      }
+      .switch {
+        width: calc(4.4rem - 1vw);
+        height: calc(2.2rem - 1vh);
+
+        .slider::before {
+          width: calc(26px - 1vw);
+          height: calc(26px - 1vh);
+        }
+      }
+    }
+    #save-fav .fav-icon {
+      font-size: calc(1.5rem - 25%);
+    }
+  }
+  @media (width < 450px) {
+    #theme-switcher {
+      gap: 5px;
+      .theme-icon {
+        font-size: calc(1.5rem - 50%);
+      }
+      .switch {
+        width: calc(4.4rem - 1.5vw);
+        height: calc(2.2rem - 1.5vh);
+
+        .slider::before {
+          width: calc(26px - 1.5vw);
+          height: calc(26px - 1.5vh);
+        }
+      }
+    }
+    #save-fav .fav-icon {
+      font-size: calc(1.5rem - 50%);
     }
   }
 }
@@ -236,13 +278,49 @@ body {
   #calendar-container {
     padding: 0 10px 10px 10px;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     width: 60%;
 
+    .given-range-container {
+      padding: 10px;
+
+      label {
+        font-weight: bold;
+      }
+
+      input {
+        margin-right: 5px;
+        border: 2px solid @primary-bg;
+        border-radius: 5px;
+        padding: 2px;
+      }
+
+      button {
+        font-size: 0.8rem;
+        font-weight: bold;
+        color: white;
+        background-color: lighten(@primary-bg, 5%);
+        border: 1px solid black;
+        border-radius: 10px;
+        padding: 6px 10px 6px 10px;
+        margin: 10px;
+        box-sizing: border-box;
+        transition: transform 0.3s ease, background-color 0.3s ease;
+        will-change: transform;
+
+        &:hover {
+          cursor: pointer;
+          transform: scale(1.05);
+          background-color: lighten(@primary-bg, 10%);
+        }
+      }
+    }
+
     #calendar {
       width: 100%;
-      height: 40vw;
+      height: 85vh;
       margin: auto;
       border: 2px solid #ccc;
       background-color: #f9f9f9;
@@ -250,6 +328,37 @@ body {
       padding: 15px;
       overflow: auto;
       scrollbar-color: darkgray #fff;
+    }
+
+    .calendar-legend {
+      display: flex;
+      flex-direction: row;
+      gap: 2vw;
+      padding: 10px;
+      margin-top: 5px;
+      background-color: #f1f1f1;
+      border: 1px solid lightgray;
+      border-radius: 2px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+    }
+
+    .legend-color {
+      width: 20px;
+      height: 20px;
+      margin-right: 10px;
+      border-radius: 50%;
+    }
+
+    .legend-label {
+      font-size: 0.9rem;
+    }
+
+    h2 {
+      font-size: 1.5rem;
     }
 
     .fc-daygrid-day {
@@ -285,18 +394,66 @@ body {
           flex: 0 0 30vw;
         }
       }
-
       #calendar-container {
-        width: 100vh;
+        width: calc(100vw - 25%);
+      }
+    }
+  }
+  @media (width < 1000px) {
+    #calendar-container {
+      h2 {
+        font-size: calc(1.5rem - 25%);
+      }
+      .fc-header-toolbar button {
+        transform: scale(0.9);
+        border-radius: 5px;
       }
     }
   }
   @media (width < 750px) {
     #calendar-container {
-      width: calc(100vh - 20%)
+      .calendar-legend {
+        flex-wrap: wrap;
+        width: 60vw;
+      }
+      .fc-toolbar {
+        flex-direction: column;
+      }
+      .fc-toolbar-chunk:first-child {
+        padding-bottom: 10px;
+      }
+      .fc-toolbar-chunk:nth-child(2) {
+        padding-bottom: 10px;
+      }
+    }
+
+    #input-container .input-group {
+      gap: calc(25px - 50%);
+
+      input {
+        width: 45vw;
+      }
+    }
+    #button-container {
+      button {
+        transform: scale(0.9);
+      }
+    }
+  }
+  @media (width < 450px) {
+    #input-container .input-group {
+      label {
+        display: none;
+      }
+      input {
+        width: 60vw;
+      }
     }
   }
 }
+
+
+// Ciemny motyw:
 
 body.dark {
   background-color: @primary-bg-dark;
@@ -358,6 +515,19 @@ body.dark {
       }
     }
     #calendar-container {
+      .given-range-container {
+        label {
+          color: @color-dark;
+        }
+        input {
+          background-color: gray;
+        }
+      }
+      .calendar-legend {
+        background-color: lighten(@primary-bg-dark,20%);
+        color: @color-dark;
+        border-color: gray;
+      }
       #calendar {
         background-color: lighten(@primary-bg-dark, 15%);
         border-color: lighten(@primary-bg-dark, 15%);
@@ -369,6 +539,7 @@ body.dark {
       button, .fc-col-header-cell{
         color: @color-dark;
       }
+
       .fc-timegrid-axis, .fc-daygrid-day, .fc-timegrid-slot {
         background-color: lighten(@primary-bg-dark, 30%);
       }
