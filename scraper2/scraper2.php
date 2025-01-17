@@ -109,7 +109,6 @@ function saveToDatabase($data, $pdo)
             echo "Pomijanie zajęć bez przypisanej grupy\n";
             continue; // Pomiń ten rekord, jeśli `id_grupy` jest wymagane
         }
-        echo "Group ID: " . ($id_grupy ?? 'brak') . "\n";
 
         $stmt = $pdo->prepare("
     INSERT INTO zajecia (id_przedmiotu, forma, id_sali, id_grupy, godzina_od, godzina_do)
