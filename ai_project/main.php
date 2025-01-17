@@ -27,9 +27,13 @@
             </span>
     </div>
     <div id="save-fav">
-            <span class="fav-icon" title="Favourites">
-                <i class="bi bi-heart-fill"></i>
-            </span>
+        <span class="fav-icon" id="fav-display" title="Favourites">
+            <i class="bi bi-heart-fill"></i>
+        </span>
+        <div id="favourites-container">
+            <h3>Ulubione Filtry</h3>
+            <ul id="favourites-list"></ul>
+        </div>
     </div>
 </div>
 <div id="container">
@@ -57,7 +61,7 @@
         <div id="button-container">
             <button id="search-button">Szukaj</button>
             <button id="clear-button" title="Wyczyść filtry">Wyczyść</button>
-            <button type="button" title="Zapisz do ulubionych">
+            <button type="button" id="save-to-favourites" title="Zapisz do ulubionych">
                 <i class="bi bi-floppy-fill"></i>
             </button>
         </div>

@@ -25,13 +25,11 @@ themeToggle.addEventListener('change', () => {
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    // Funkcja do zapisywania numeru indeksu w localStorage
     const saveIndeksToLocalStorage = () => {
         const indeksInput = document.querySelector('input[name="indeks"]');
         localStorage.setItem('indeks', indeksInput.value.trim());
     };
 
-    // Funkcja do wczytywania numeru indeksu z localStorage
     const loadIndeksFromLocalStorage = () => {
         const indeksInput = document.querySelector('input[name="indeks"]');
         const savedIndeks = localStorage.getItem('indeks');
@@ -40,10 +38,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     };
 
-    // Wczytaj numer indeksu z localStorage po załadowaniu strony
     loadIndeksFromLocalStorage();
 
-    // Obsługuje zapisanie numeru indeksu przy zmianie
     document.querySelector('input[name="indeks"]').addEventListener('input', saveIndeksToLocalStorage);
 
     const getTitleFormat = () => {
@@ -59,11 +55,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Inicjalizacja kalendarza FullCalendar
     const calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: "timeGridDay", // Domyślny widok
+        initialView: "timeGridDay",
         headerToolbar: {
-            left: "prev,next today", // Nawigacja
-            center: "title", // Tytuł kalendarza
-            right: "timeGridDay,timeGridWeek,dayGridMonth,semesterButton" // Widoki
+            //left: "prev,next today",
+            left: "today prev next",
+            center: "title",
+            right: "timeGridDay,timeGridWeek,dayGridMonth,semesterButton"
         },
         slotMinTime: "08:00:00",
         slotMaxTime: "21:00:00",
@@ -128,7 +125,7 @@ document.addEventListener("DOMContentLoaded", function () {
             },
         },
 
-        events: [], // Wydarzenia będą dodawane dynamicznie
+        events: [],
     });
 
     calendar.render();
@@ -179,7 +176,13 @@ document.addEventListener("DOMContentLoaded", function () {
         const plan = [
             { data: "2025-01-06", godzina: "08:00", przedmiot: "Aplikacje Internetowe 1", sala: "303", wykladowca: "mgr Aleksandra Karczmarczyk", grupa: "336", indeks: "51000" },
             { data: "2025-01-06", godzina: "10:00", przedmiot: "Podstawy Ochrony Informacji", sala: "120", wykladowca: "dr hab. inż. Tomasz Hyla", grupa: "336", indeks: "49999" },
-            { data: "2025-01-07", godzina: "12:00", przedmiot: "Sztuczna Inteligencja", sala: "313", wykladowca: "dr inż. Joanna Kołodziejczyk", grupa: "336", indeks: "43434" }
+            { data: "2025-01-07", godzina: "12:00", przedmiot: "Sztuczna Inteligencja", sala: "313", wykladowca: "dr inż. Joanna Kołodziejczyk", grupa: "336", indeks: "43434" },
+            { data: "2025-01-14", godzina: "08:00", przedmiot: "Aplikacje Internetowe 1", sala: "303", wykladowca: "mgr Aleksandra Karczmarczyk", grupa: "336", indeks: "51000" },
+            { data: "2025-01-15", godzina: "10:00", przedmiot: "Podstawy Ochrony Informacji", sala: "120", wykladowca: "dr hab. inż. Tomasz Hyla", grupa: "336", indeks: "49999" },
+            { data: "2025-01-20", godzina: "12:00", przedmiot: "Sztuczna Inteligencja", sala: "313", wykladowca: "dr inż. Joanna Kołodziejczyk", grupa: "336", indeks: "43434" },
+            { data: "2025-01-06", godzina: "08:00", przedmiot: "Sieci Komputerowe", sala: "310", wykladowca: "dr inż. Marek Jaskuła", grupa: "336", indeks: "51001" },
+            { data: "2025-01-06", godzina: "10:00", przedmiot: "Podstawy Ochrony Informacji", sala: "120", wykladowca: "dr hab. inż. Tomasz Hyla", grupa: "336", indeks: "49999" },
+            { data: "2025-01-07", godzina: "12:00", przedmiot: "Język angielski 2", sala: "313", wykladowca: "mgr Małgorzata Kos", grupa: "336", indeks: "44455" }
         ];
 
         const filteredPlan = plan.filter(entry => {
@@ -269,10 +272,87 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function updateCustomButtons() {
         calendar.setOption('headerToolbar', {
-            left: 'prev,next today',
+            left: "today prev next",
             center: 'title',
             right: 'timeGridDay,timeGridWeek,dayGridMonth,semesterButton'
         });
     }
-
 });
+
+function saveFilters() {
+    const indeks = document.querySelector('input[name="indeks"]').value;
+    const wykladowca = document.querySelector('input[name="wykladowca"]').value;
+    const grupa = document.querySelector('input[name="grupa"]').value;
+    const sala = document.querySelector('input[name="sala"]').value;
+    const przedmiot = document.querySelector('input[name="przedmiot"]').value;
+
+    // Sprawdzenie, czy przynajmniej jedno pole jest wypełnione
+    if (!indeks && !wykladowca && !grupa && !sala && !przedmiot) {
+        alert('Wypełnij przynajmniej jedno pole przed zapisaniem.');
+        return;
+    }
+
+    const filterName = prompt('Wpisz nazwę dla filtra:', 'Mój filtr');
+    if (!filterName) {
+        alert('Nazwa filtra jest wymagana!');
+        return;
+    }
+
+    const filters = {
+        name: filterName,
+        indeks,
+        wykladowca,
+        grupa,
+        sala,
+        przedmiot
+    };
+
+    // Pobranie istniejących filtrów z localStorage lub utworzenie nowej tablicy
+    let favourites = JSON.parse(localStorage.getItem('favourites')) || [];
+    favourites.push(filters);
+    localStorage.setItem('favourites', JSON.stringify(favourites));
+
+    alert(`Filtr "${filterName}" został zapisany do ulubionych!`);
+}
+
+function showFavourites() {
+    const favouritesContainer = document.getElementById('favourites-container');
+    const favouritesList = document.getElementById('favourites-list');
+    favouritesList.innerHTML = '';
+    let favourites = JSON.parse(localStorage.getItem('favourites')) || [];
+
+    favourites.forEach((filter, index) => {
+        let li = document.createElement('li');
+        li.innerHTML = `
+            ${filter.name}
+            <div id="load-del-buttons">
+            <button onclick="loadFilters(${index})" id="load-btn"><i class="bi bi-upload" title="Wczytaj"></i></button>
+            <button onclick="removeFilters(${index})" id="del-btn"><i class="bi bi-trash3" title="Usuń"></i></button>
+            </div>
+        `;
+        favouritesList.appendChild(li);
+    });
+    favouritesContainer.style.display = favouritesContainer.style.display === 'none' ? 'block' : 'none';
+}
+
+function removeFilters(index) {
+    let favourites = JSON.parse(localStorage.getItem('favourites')) || [];
+    const filterName = favourites[index].name;
+    favourites.splice(index, 1);
+    localStorage.setItem('favourites', JSON.stringify(favourites));
+    alert(`Filtr "${filterName}" został usunięty z ulubionych.`);
+    showFavourites();
+}
+function loadFilters(index) {
+    let favourites = JSON.parse(localStorage.getItem('favourites')) || [];
+    const filter = favourites[index];
+    document.querySelector('input[name="indeks"]').value = filter.indeks;
+    document.querySelector('input[name="wykladowca"]').value = filter.wykladowca;
+    document.querySelector('input[name="grupa"]').value = filter.grupa;
+    document.querySelector('input[name="sala"]').value = filter.sala;
+    document.querySelector('input[name="przedmiot"]').value = filter.przedmiot;
+}
+
+// Podpięcie funkcji do przycisków
+document.getElementById('fav-display').addEventListener('click', showFavourites);
+document.getElementById('save-to-favourites').addEventListener('click', saveFilters);
