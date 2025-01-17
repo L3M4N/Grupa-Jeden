@@ -1,6 +1,5 @@
 "use strict";
 
-// Zmiana motywu
 const body = document.body;
 const themeToggle = document.getElementById('theme-toggle');
 const logoDark = document.getElementById('logo');
@@ -53,7 +52,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const calendarEl = document.getElementById("calendar");
     let isCustomView = false;
 
-    // Inicjalizacja kalendarza FullCalendar
     const calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: "timeGridDay",
         headerToolbar: {
@@ -286,7 +284,6 @@ function saveFilters() {
     const sala = document.querySelector('input[name="sala"]').value;
     const przedmiot = document.querySelector('input[name="przedmiot"]').value;
 
-    // Sprawdzenie, czy przynajmniej jedno pole jest wypełnione
     if (!indeks && !wykladowca && !grupa && !sala && !przedmiot) {
         alert('Wypełnij przynajmniej jedno pole przed zapisaniem.');
         return;
@@ -307,7 +304,6 @@ function saveFilters() {
         przedmiot
     };
 
-    // Pobranie istniejących filtrów z localStorage lub utworzenie nowej tablicy
     let favourites = JSON.parse(localStorage.getItem('favourites')) || [];
     favourites.push(filters);
     localStorage.setItem('favourites', JSON.stringify(favourites));
@@ -353,6 +349,5 @@ function loadFilters(index) {
     document.querySelector('input[name="przedmiot"]').value = filter.przedmiot;
 }
 
-// Podpięcie funkcji do przycisków
 document.getElementById('fav-display').addEventListener('click', showFavourites);
 document.getElementById('save-to-favourites').addEventListener('click', saveFilters);
