@@ -1,6 +1,7 @@
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   transition: background-color 0.3s ease, color 0.3s ease;
+  will-change: background-color, color;
 }
 #header-container {
   display: flex;
@@ -306,6 +307,57 @@ body {
 #container #input-container #button-container button:nth-child(3):hover {
   background-color: #2d7789;
 }
+#container #input-container #url-container {
+  display: flex;
+  justify-content: center;
+  gap: 0.5vw;
+}
+#container #input-container #url-container #generate-url {
+  padding: 4px 10px 4px 10px;
+  cursor: pointer;
+  background-color: #6073d0;
+  border: 1px solid black;
+  border-radius: 5px;
+  outline: #6073d0 solid 2px;
+  color: white;
+  font-weight: bold;
+  transition: transform 0.3s ease, background-color 0.5s ease;
+  will-change: transform, background-color;
+}
+#container #input-container #url-container #generate-url:hover {
+  transform: scale(1.05);
+  background-color: #7485d6;
+}
+#container #input-container #url-container #generated-url {
+  padding: 6px;
+  width: clamp(8vw, 12vw, 50%);
+  font-size: 0.8rem;
+  border-radius: 5px;
+  border: 2px solid #2e419c;
+  box-sizing: border-box;
+  transition: background-color 0.3s ease;
+}
+#container #input-container #url-container #copy-url {
+  background-color: #009a00;
+  padding: 4px 15px 4px 15px;
+  border-radius: 5px;
+  border: 1px solid black;
+  color: white;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+  will-change: transform, background-color;
+  outline: green solid 2px;
+}
+#container #input-container #url-container #copy-url:hover {
+  transform: scale(1.05);
+  background-color: #00a600;
+}
+#container #input-container #url-container #copy-url i {
+  display: inline-block;
+  transform: rotate(-45deg);
+}
 #container #calendar-container {
   padding: 0 10px 10px 10px;
   display: flex;
@@ -511,6 +563,27 @@ body.dark #container #input-container #button-container button {
 }
 body.dark #container #input-container #button-container button:first-child {
   background-color: #176238;
+}
+body.dark #container #input-container #url-container #generate-url {
+  background-color: #2e419c;
+  color: #cccccc;
+  outline-color: #3449b0;
+}
+body.dark #container #input-container #url-container #generate-url:hover {
+  background-color: #3449b0;
+}
+body.dark #container #input-container #url-container #generated-url {
+  color: #cccccc;
+  background-color: #393939;
+  border-color: #223175;
+}
+body.dark #container #input-container #url-container #copy-url {
+  color: #cccccc;
+  background-color: #006700;
+  outline-color: #004d00;
+}
+body.dark #container #input-container #url-container #copy-url:hover {
+  background-color: #007600;
 }
 body.dark #container #calendar-container .given-range-container label {
   color: #cccccc;

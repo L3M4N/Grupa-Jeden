@@ -58,12 +58,24 @@
             <label for="przedmiot">Przedmiot:</label>
             <input type="text" name="przedmiot" placeholder="Przedmiot"/>
         </div>
+        <?php
+            $indeks = isset($_GET['indeks']) ? htmlspecialchars($_GET['indeks']) : '';
+            $wykladowca = isset($_GET['wykladowca']) ? htmlspecialchars($_GET['wykladowca']) : '';
+            $grupa = isset($_GET['grupa']) ? htmlspecialchars($_GET['grupa']) : '';
+            $sala = isset($_GET['sala']) ? htmlspecialchars($_GET['sala']) : '';
+            $przedmiot = isset($_GET['przedmiot']) ? htmlspecialchars($_GET['przedmiot']) : '';
+        ?>
         <div id="button-container">
             <button id="search-button">Szukaj</button>
             <button id="clear-button" title="Wyczyść filtry">Wyczyść</button>
             <button type="button" id="save-to-favourites" title="Zapisz do ulubionych">
                 <i class="bi bi-floppy-fill"></i>
             </button>
+        </div>
+        <div id="url-container">
+            <button id="generate-url">Generuj URL</button>
+            <input type="text" id="generated-url" readonly placeholder="Wygenerowany URL"/>
+            <button id="copy-url" title="Skopiuj URL do schowka"><i class="bi bi-link"></i></button>
         </div>
     </div>
     <div id="calendar-container">
@@ -106,6 +118,15 @@
     </div>
     <div id="table-container"></div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelector('input[name="indeks"]').value = "<?php echo $indeks; ?>";
+        document.querySelector('input[name="wykladowca"]').value = "<?php echo $wykladowca; ?>";
+        document.querySelector('input[name="grupa"]').value = "<?php echo $grupa; ?>";
+        document.querySelector('input[name="sala"]').value = "<?php echo $sala; ?>";
+        document.querySelector('input[name="przedmiot"]').value = "<?php echo $przedmiot; ?>";
+    });
+</script>
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
 <script src="script.js"></script>
 </body>

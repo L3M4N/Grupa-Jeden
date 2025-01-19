@@ -8,6 +8,7 @@
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   transition: background-color 0.3s ease, color 0.3s ease;
+  will-change: background-color, color;
 }
 
 #header-container {
@@ -353,6 +354,62 @@ body {
         }
       }
     }
+    #url-container {
+      display: flex;
+      justify-content: center;
+      gap: 0.5vw;
+
+      #generate-url {
+        padding: 4px 10px 4px 10px;
+        cursor: pointer;
+        background-color: lighten(@primary-bg, 20%);
+        border: 1px solid black;
+        border-radius: 5px;
+        outline: lighten(@primary-bg, 20%) solid 2px;
+        color: white;
+        font-weight: bold;
+        transition: transform 0.3s ease, background-color 0.5s ease;
+        will-change: transform, background-color;
+
+        &:hover {
+          transform: scale(1.05);
+          background-color: lighten(@primary-bg, 25%);
+        }
+      }
+
+      #generated-url {
+        padding: 6px;
+        width: clamp(8vw, 12vw, 50%);
+        font-size: 0.8rem;
+        border-radius: 5px;
+        border: 2px solid @primary-bg;
+        box-sizing: border-box;
+        transition: background-color 0.3s ease;
+      }
+
+      #copy-url {
+        background-color: lighten(green, 5%);
+        padding: 4px 15px 4px 15px;
+        border-radius: 5px;
+        border: 1px solid black;
+        color: white;
+        font-weight: bold;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: transform 0.3s ease, background-color 0.3s ease;
+        will-change: transform, background-color;
+        outline: green solid 2px;
+
+        &:hover {
+          transform: scale(1.05);
+          background-color: lighten(green, 7.5%);
+        }
+        i {
+          display: inline-block;
+          transform: rotate(-45deg);
+        }
+      }
+    }
   }
 
   #calendar-container {
@@ -588,7 +645,7 @@ body.dark {
   #container {
     #input-container {
       input {
-        color: @color-dark ;
+        color: @color-dark;
         background-color: lighten(@primary-bg-dark, 10%);
         border-color: darken(@primary-bg, 10%);
 
@@ -605,6 +662,31 @@ body.dark {
         font-weight: bold;
         &:first-child {
           background-color: darken(@button-search-color, 10%);
+        }
+      }
+      #url-container {
+        #generate-url {
+          background-color: @primary-bg;
+          color: @color-dark;
+          outline-color: lighten(@primary-bg, 5%);
+
+          &:hover {
+            background-color: lighten(@primary-bg, 5%);
+          }
+        }
+        #generated-url {
+          color: @color-dark;
+          background-color: lighten(@primary-bg-dark, 10%);
+          border-color: darken(@primary-bg, 10%);
+        }
+        #copy-url {
+          color: @color-dark;
+          background-color: darken(green, 5%);
+          outline-color: darken(green, 10%);
+
+          &:hover {
+            background-color: darken(green, 2%);
+          }
         }
       }
     }

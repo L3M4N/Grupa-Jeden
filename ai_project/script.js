@@ -160,7 +160,7 @@ document.addEventListener("DOMContentLoaded", function () {
             calendar.gotoDate(endDate);
 
         } else {
-            alert('Please select a valid start date and duration.');
+            alert('Błędny zakres!');
         }
     });
 
@@ -351,3 +351,35 @@ function loadFilters(index) {
 
 document.getElementById('fav-display').addEventListener('click', showFavourites);
 document.getElementById('save-to-favourites').addEventListener('click', saveFilters);
+
+document.getElementById('generate-url').addEventListener('click', function() {
+    const params = new URLSearchParams();
+
+    document.querySelectorAll('#input-container .input-group input').forEach(input => {
+        if (input.value) {
+            params.append(input.name, input.value);
+        }
+    });
+
+    const baseUrl = window.location.origin + window.location.pathname;
+    const generatedUrl = `${baseUrl}?${params.toString()}`;
+    document.getElementById('generated-url').value = generatedUrl;
+});
+
+document.getElementById('copy-url').addEventListener('click', function() {
+
+    var urlInput = document.getElementById('generated-url');
+
+    urlInput.select();
+
+    copyURLToClipboard(urlInput.value);
+});
+
+async function copyURLToClipboard(text) {
+    try {
+        await navigator.clipboard.writeText(text);
+        alert("URL został skopiowany do schowka!");
+    } catch {
+        alert("Błąd przy kopiowaniu do schowka!")
+    }
+}
