@@ -92,7 +92,12 @@ document.addEventListener("DOMContentLoaded", function () {
             },
             customMultiDay: {
                 type: 'list',
-                buttonText: 'Custom Range'
+                buttonText: 'Custom Range',
+                headerToolbar: {
+                    left: "today",
+                    center: 'title',
+                    right: 'timeGridDay,timeGridWeek,dayGridMonth,semesterButton'
+                },
             },
         },
 
@@ -124,6 +129,37 @@ document.addEventListener("DOMContentLoaded", function () {
         },
 
         events: [],
+
+        eventMouseEnter: function(info){
+            const event = info.event;
+            const tooltipContent = `
+            <div><strong>${event.title}</strong></div>
+            <div><strong>Wykładowca:</strong> ${event.extendedProps.teacher}</div>
+            <div><strong>Pokój:</strong> ${event.extendedProps.location}</div>
+            <div><strong>Grupa:</strong> ${event.extendedProps.group}</div>
+            <div><strong>Statystyki:</strong> ${event.extendedProps.description}</div>
+        `;
+
+        const tooltip = document.createElement('div');
+        tooltip.className = 'event-tooltip';
+        tooltip.innerHTML = tooltipContent;
+        document.body.appendChild(tooltip);
+
+        
+        tooltip.style.position = 'absolute';
+        tooltip.style.top = `${info.jsEvent.pageY + 10}px`;
+        tooltip.style.left = `${info.jsEvent.pageX + 10}px`;
+        tooltip.style.backgroundColor = '#fff';
+        tooltip.style.border = '1px solid #ccc';
+        tooltip.style.padding = '10px';
+        tooltip.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+        tooltip.style.zIndex = '9999'; 
+
+        
+        info.el.addEventListener('mouseleave', function() {
+            tooltip.remove();
+        });
+        }
     });
 
     calendar.render();
@@ -135,9 +171,11 @@ document.addEventListener("DOMContentLoaded", function () {
     calendar.on('datesSet', function (info) {
         if (info.view.type === 'semester1View' || info.view.type === 'semester2View') {
             isCustomView = true;
+            updateCustomButtons();
+ 
         } else {
             isCustomView = false;
-            updateCustomButtons();
+            resetCustomButtons();
         }
     });
 
@@ -155,9 +193,15 @@ document.addEventListener("DOMContentLoaded", function () {
                 start: startDate.toISOString().split('T')[0],
                 end: adjustedEndDate.toISOString().split('T')[0]
             });
+            
 
             calendar.changeView('customMultiDay');
             calendar.gotoDate(endDate);
+            calendar.setOption('headerToolbar', {
+                left: "",
+                center: 'title',
+                right: 'timeGridDay,timeGridWeek,dayGridMonth,semesterButton'
+            });
 
         } else {
             alert('Błędny zakres!');
@@ -205,7 +249,8 @@ document.addEventListener("DOMContentLoaded", function () {
             return {
                 title: entry.przedmiot,
                 start: startDate,
-                end: endDate
+                end: endDate,
+                
             };
         });
 
@@ -264,16 +309,25 @@ document.addEventListener("DOMContentLoaded", function () {
         } else {
             currentSemester = 1;
             calendar.changeView('semester1View');
-            calendar.gotoDate(new Date(currentYear -1, 9, 1));
+            calendar.gotoDate(new Date(currentYear-1, 9, 1));
         }
     }
 
     function updateCustomButtons() {
         calendar.setOption('headerToolbar', {
+            left: "customToday customPrev customNext",
+            center: 'title',
+            right: 'timeGridDay,timeGridWeek,dayGridMonth,semesterButton'
+        });
+    }
+
+    function resetCustomButtons() {
+        calendar.setOption('headerToolbar', {
             left: "today prev next",
             center: 'title',
             right: 'timeGridDay,timeGridWeek,dayGridMonth,semesterButton'
         });
+        
     }
 });
 
