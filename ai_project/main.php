@@ -14,18 +14,35 @@
         <img src="imgs/logo-zut.svg" alt="Logo ZUT">
     </div>
     <div id="title">Plan ZUT</div>
+
+    <div id="font-size-options">
+        <button id="increase-font-size" title="Powiększ czcionkę">
+            <i class="bi bi-plus-lg"></i>
+        </button>
+        <button id="decrease-font-size" title="Pomniejsz czcionkę">
+            <i class="bi bi-dash-lg"></i>
+        </button>
+    </div>
+
+    <div id="accessibility-options">
+        <button id="high-contrast-toggle" title="Tryb dużego kontrastu">
+            <i class="bi bi-eye-fill"></i>
+        </button>
+    </div>
+
     <div id="theme-switcher">
-            <span class="theme-icon" title="Light Mode">
-                <i class="bi bi-brightness-high-fill"></i>
-            </span>
+        <span class="theme-icon" title="Light Mode">
+            <i class="bi bi-brightness-high-fill"></i>
+        </span>
         <label class="switch">
             <input type="checkbox" id="theme-toggle">
             <span class="slider round"></span>
         </label>
         <span class="theme-icon" title="Dark Mode">
-                <i class="bi bi-moon-fill"></i>
-            </span>
+            <i class="bi bi-moon-fill"></i>
+        </span>
     </div>
+
     <div id="save-fav">
         <span class="fav-icon" id="fav-display" title="Favourites">
             <i class="bi bi-heart-fill"></i>
@@ -59,11 +76,11 @@
             <input type="text" name="przedmiot" placeholder="Przedmiot"/>
         </div>
         <?php
-            $indeks = isset($_GET['indeks']) ? htmlspecialchars($_GET['indeks']) : '';
-            $wykladowca = isset($_GET['wykladowca']) ? htmlspecialchars($_GET['wykladowca']) : '';
-            $grupa = isset($_GET['grupa']) ? htmlspecialchars($_GET['grupa']) : '';
-            $sala = isset($_GET['sala']) ? htmlspecialchars($_GET['sala']) : '';
-            $przedmiot = isset($_GET['przedmiot']) ? htmlspecialchars($_GET['przedmiot']) : '';
+        $indeks = isset($_GET['indeks']) ? htmlspecialchars($_GET['indeks']) : '';
+        $wykladowca = isset($_GET['wykladowca']) ? htmlspecialchars($_GET['wykladowca']) : '';
+        $grupa = isset($_GET['grupa']) ? htmlspecialchars($_GET['grupa']) : '';
+        $sala = isset($_GET['sala']) ? htmlspecialchars($_GET['sala']) : '';
+        $przedmiot = isset($_GET['przedmiot']) ? htmlspecialchars($_GET['przedmiot']) : '';
         ?>
         <div id="button-container">
             <button id="search-button">Szukaj</button>
@@ -118,6 +135,7 @@
     </div>
     <div id="table-container"></div>
 </div>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         document.querySelector('input[name="indeks"]').value = "<?php echo $indeks; ?>";
