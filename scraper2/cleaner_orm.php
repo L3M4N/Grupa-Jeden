@@ -1,6 +1,6 @@
 <?php
 
-require 'bootstrap.php';
+require 'ORM.php';
 require 'Zajecia.php';
 require 'Przedmiot.php';
 require 'Prowadzacy.php';
@@ -10,42 +10,21 @@ require 'PrzedmiotProwadzacy.php';
 
 function deleteOldData() {
     try {
-        // Oblicz datę sprzed 6 miesięcy
-        $dateThreshold = (new DateTime())->modify('-6 months')->format('Y-m-d');
+        $dateThreshold = (new DateTime())->modify('-6 months')->format('Y-m-d H:i:s');
+        echo "Usuwanie danych starszych niż: {$dateThreshold}\n";
 
-        // Usuń zajęcia starsze niż 6 miesięcy
-        $deleted = Zajecia::where('godzina_od', '<', $dateThreshold)->delete();
+        $deletedClasses = Zajecia::where('godzina_od', '<', $dateThreshold);
 
-        echo "Usunięto {$deleted} zajęć starszych niż 6 miesięcy.\n";
-
-        // Usuń osierocone dane
-        deleteOrphanedData();
+        foreach ($deletedClasses as $class) {
+            Zajecia::delete($class['id_zajecia']);
+        }
+        echo "Usunięto stare zajęcia.\n";
 
     } catch (Exception $e) {
         echo "Błąd podczas usuwania danych: " . $e->getMessage() . "\n";
     }
 }
 
-function deleteOrphanedData() {
-    try {
-        // Usuń osierocone przedmioty
-        Przedmiot::doesntHave('zajecia')->delete();
-
-        // Usuń osieroconych prowadzących
-        Prowadzacy::doesntHave('przedmiotProwadzacy')->delete();
-
-        // Usuń osierocone grupy
-        Grupa::doesntHave('zajecia')->delete();
-
-        // Usuń osierocone sale
-        Sala::doesntHave('zajecia')->delete();
-
-        echo "Osierocone dane zostały usunięte.\n";
-
-    } catch (Exception $e) {
-        echo "Błąd podczas usuwania osieroconych danych: " . $e->getMessage() . "\n";
-    }
-}
 
 // Wywołanie funkcji
 deleteOldData();

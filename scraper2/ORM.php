@@ -28,4 +28,9 @@ class ORM
         $stmt->execute(array_values($data));
         return self::$pdo->lastInsertId();
     }
+
+    public static function delete($id, $primaryKey = 'id') {
+        $stmt = self::$pdo->prepare("DELETE FROM " . static::$table . " WHERE {$primaryKey} = ?");
+        return $stmt->execute([$id]);
+    }
 }
