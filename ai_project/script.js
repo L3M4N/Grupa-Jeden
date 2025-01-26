@@ -23,6 +23,39 @@ themeToggle.addEventListener('change', () => {
 });
 
 document.addEventListener("DOMContentLoaded", function () {
+    // kontrast
+    const highContrastToggle = document.getElementById("high-contrast-toggle");
+    const isHighContrast = localStorage.getItem("high-contrast") === "true";
+    if (isHighContrast) {
+        document.body.classList.add("high-contrast");
+    }
+
+    highContrastToggle.addEventListener("click", () => {
+        document.body.classList.toggle("high-contrast");
+        const highContrastEnabled = document.body.classList.contains("high-contrast");
+        localStorage.setItem("high-contrast", highContrastEnabled.toString());
+    });
+
+    // font resizing
+    const increaseFontSizeButton = document.getElementById("increase-font-size");
+    const decreaseFontSizeButton = document.getElementById("decrease-font-size");
+
+    const adjustFontSize = (adjustment) => {
+        const root = document.documentElement; 
+        const currentFontSize = parseFloat(getComputedStyle(root).fontSize);
+        const newFontSize = Math.max(10, Math.min(currentFontSize + adjustment, 24));
+        root.style.fontSize = `${newFontSize}px`;
+        localStorage.setItem("font-size", newFontSize); 
+    };
+
+    const savedFontSize = localStorage.getItem("font-size");
+    if (savedFontSize) {
+        document.documentElement.style.fontSize = `${savedFontSize}px`;
+    }
+
+    increaseFontSizeButton.addEventListener("click", () => adjustFontSize(2));
+    decreaseFontSizeButton.addEventListener("click", () => adjustFontSize(-2));
+
 
     const saveIndeksToLocalStorage = () => {
         const indeksInput = document.querySelector('input[name="indeks"]');
@@ -140,25 +173,25 @@ document.addEventListener("DOMContentLoaded", function () {
             <div><strong>Statystyki:</strong> ${event.extendedProps.description}</div>
         `;
 
-        const tooltip = document.createElement('div');
-        tooltip.className = 'event-tooltip';
-        tooltip.innerHTML = tooltipContent;
-        document.body.appendChild(tooltip);
+            const tooltip = document.createElement('div');
+            tooltip.className = 'event-tooltip';
+            tooltip.innerHTML = tooltipContent;
+            document.body.appendChild(tooltip);
 
-        
-        tooltip.style.position = 'absolute';
-        tooltip.style.top = `${info.jsEvent.pageY + 10}px`;
-        tooltip.style.left = `${info.jsEvent.pageX + 10}px`;
-        tooltip.style.backgroundColor = '#fff';
-        tooltip.style.border = '1px solid #ccc';
-        tooltip.style.padding = '10px';
-        tooltip.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
-        tooltip.style.zIndex = '9999'; 
 
-        
-        info.el.addEventListener('mouseleave', function() {
-            tooltip.remove();
-        });
+            tooltip.style.position = 'absolute';
+            tooltip.style.top = `${info.jsEvent.pageY + 10}px`;
+            tooltip.style.left = `${info.jsEvent.pageX + 10}px`;
+            tooltip.style.backgroundColor = '#fff';
+            tooltip.style.border = '1px solid #ccc';
+            tooltip.style.padding = '10px';
+            tooltip.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+            tooltip.style.zIndex = '9999';
+
+
+            info.el.addEventListener('mouseleave', function() {
+                tooltip.remove();
+            });
         }
     });
 
@@ -172,7 +205,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (info.view.type === 'semester1View' || info.view.type === 'semester2View') {
             isCustomView = true;
             updateCustomButtons();
- 
+
         } else {
             isCustomView = false;
             resetCustomButtons();
@@ -193,7 +226,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 start: startDate.toISOString().split('T')[0],
                 end: adjustedEndDate.toISOString().split('T')[0]
             });
-            
+
 
             calendar.changeView('customMultiDay');
             calendar.gotoDate(endDate);
@@ -250,7 +283,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 title: entry.przedmiot,
                 start: startDate,
                 end: endDate,
-                
+
             };
         });
 
@@ -327,7 +360,7 @@ document.addEventListener("DOMContentLoaded", function () {
             center: 'title',
             right: 'timeGridDay,timeGridWeek,dayGridMonth,semesterButton'
         });
-        
+
     }
 });
 
