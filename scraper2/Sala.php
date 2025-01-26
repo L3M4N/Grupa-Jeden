@@ -1,10 +1,8 @@
 <?php
 
 
-use Illuminate\Database\Eloquent\Model;
-
-class Sala extends Model {
-    protected $table = 'sala';
+class Sala extends ORM {
+    protected static $table = 'sala';
     protected $primaryKey = 'id_sali';
     public $timestamps = false;
 

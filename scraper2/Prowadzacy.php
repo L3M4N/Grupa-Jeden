@@ -1,10 +1,7 @@
 <?php
 
-
-use Illuminate\Database\Eloquent\Model;
-
-class Prowadzacy extends Model {
-    protected $table = 'prowadzacy';
+class Prowadzacy extends ORM {
+    protected static $table = 'prowadzacy';
     protected $primaryKey = 'nr_indeksu_p';
     public $timestamps = false;
 
