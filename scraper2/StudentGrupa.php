@@ -1,9 +1,7 @@
 <?php
 
-use Illuminate\Database\Eloquent\Model;
-
-class StudentGrupa extends Model {
-    protected $table = 'student_grupa';
+class StudentGrupa extends ORM {
+    protected static $table = 'student_grupa';
     public $timestamps = false;
 
     protected $fillable = ['nr_indeksu_s', 'id_grupy'];

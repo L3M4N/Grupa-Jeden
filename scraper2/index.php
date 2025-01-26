@@ -1,6 +1,6 @@
 <?php
 
-require 'bootstrap.php';
+require 'ORM.php';
 require 'Prowadzacy.php';
 require 'Przedmiot.php';
 require 'PrzedmiotProwadzacy.php';
@@ -35,28 +35,6 @@ function getTeachersFromAPI() {
     return array_unique($teachers);
 }
 
-function scrapeStudentData($studentIndex, $start_date, $end_date) {
-    $url = "https://plan.zut.edu.pl/schedule_student.php?number={$studentIndex}&start={$start_date}&end={$end_date}";
-    echo "URL API: {$url}\n"; // Debugowanie URL
-    try {
-        $response = file_get_contents($url);
-        $data = json_decode($response, true);
-
-        if (!$data || !is_array($data)) {
-            echo "Błąd: API zwróciło pustą odpowiedź dla numeru indeksu {$studentIndex}.\n";
-            return [];
-        }
-
-        return $data;
-    } catch (Exception $e) {
-        echo "Błąd podczas pobierania danych z API dla numeru indeksu {$studentIndex}: " . $e->getMessage() . "\n";
-        return [];
-    }
-}
-
-
-
-
 
 function scrapeLessonData($teacher, $start_date, $end_date) {
     $url = "https://plan.zut.edu.pl/schedule_student.php?teacher=" . urlencode($teacher) . "&start={$start_date}&end={$end_date}";
@@ -76,35 +54,13 @@ function scrapeLessonData($teacher, $start_date, $end_date) {
     }
 }
 
-function processStudentData($studentIndex, $data) {
-    // Zapis studenta
-    $student = Student::firstOrCreate(['nr_indeksu_s' => $studentIndex]);
-
-    // Iteracja po danych i zapis grup
-    foreach ($data as $lesson) {
-        if (isset($lesson['group_name'])) {
-            // Znajdź lub utwórz grupę
-            $grupa = Grupa::firstOrCreate(['nazwa' => $lesson['group_name']]);
-
-            // Zapis powiązania studenta z grupą
-            StudentGrupa::firstOrCreate([
-                'nr_indeksu_s' => $student->nr_indeksu_s,
-                'id_grupy' => $grupa->id_grupy,
-            ]);
-        }
-    }
-
-    echo "Dane dla studenta o numerze indeksu {$studentIndex} zostały zapisane.\n";
-}
-
-
 function processLesson($lesson) {
-    $grupa = Grupa::firstOrCreate(['nazwa' => $lesson['group_name'] ?? 'null']);
-    $prowadzacy = Prowadzacy::firstOrCreate(['nazwisko_imie_p' => $lesson['worker'] ?? 'null']);
-    $przedmiot = Przedmiot::firstOrCreate(['nazwa' => $lesson['subject'] ?? 'null']);
-    $sala = Sala::firstOrCreate(['nr_sali' => $lesson['room'] ?? 'null']);
+    $grupa = Grupa::create(['nazwa' => $lesson['group_name'] ?? 'null']);
+    $prowadzacy = Prowadzacy::create(['nazwisko_imie_p' => $lesson['worker'] ?? 'null']);
+    $przedmiot = Przedmiot::create(['nazwa' => $lesson['subject'] ?? 'null']);
+    $sala = Sala::create(['nr_sali' => $lesson['room'] ?? 'null']);
 
-    PrzedmiotProwadzacy::firstOrCreate([
+    PrzedmiotProwadzacy::create([
         'id_przedmiotu' => $przedmiot->id_przedmiotu,
         'nr_indeksu_p' => $prowadzacy->nr_indeksu_p,
     ]);
@@ -119,15 +75,90 @@ function processLesson($lesson) {
     ]);
 }
 
+function scrapeStudentData($studentIndex, $start_date, $end_date) {
+    $url = "https://plan.zut.edu.pl/schedule_student.php?number={$studentIndex}&start={$start_date}&end={$end_date}";
 
+    try {
+        $response = file_get_contents($url);
+        $data = json_decode($response, true);
+
+        if (!$data || !is_array($data)) {
+            echo "Błąd: API zwróciło pustą odpowiedź dla numeru indeksu {$studentIndex}.\n";
+            return [];
+        }
+
+        return $data;
+    } catch (Exception $e) {
+        echo "Błąd podczas pobierania danych z API dla numeru indeksu {$studentIndex}: " . $e->getMessage() . "\n";
+        return [];
+    }
+}
+
+function processStudentData($studentIndex, $data) {
+    // Sprawdzenie istnienia studenta
+    $existingStudent = Student::where('nr_indeksu_s', $studentIndex);
+    if (empty($existingStudent)) {
+        // Dodanie nowego studenta
+        Student::create(['nr_indeksu_s' => $studentIndex]);
+        echo "Dodano nowego studenta o numerze indeksu: {$studentIndex}\n";
+    }
+
+    // Iteracja po lekcjach
+    foreach ($data as $lesson) {
+        if (isset($lesson['group_name'])) {
+            // Znajdź grupę lub dodaj nową
+            $existingGroup = Grupa::where('nazwa', $lesson['group_name']);
+            $groupId = null;
+
+            if (empty($existingGroup)) {
+                // Tworzenie nowej grupy
+                $groupId = Grupa::create(['nazwa' => $lesson['group_name']]);
+                echo "Dodano nową grupę: {$lesson['group_name']}\n";
+            } else {
+                $groupId = $existingGroup[0]['id_grupy']; // Pobranie ID grupy
+            }
+
+            // Sprawdzenie powiązania student -> grupa
+            $existingRelation = StudentGrupa::where('nr_indeksu_s', $studentIndex);
+            $relationExists = false;
+
+            foreach ($existingRelation as $relation) {
+                if ($relation['id_grupy'] == $groupId) {
+                    $relationExists = true;
+                    break;
+                }
+            }
+
+            if (!$relationExists) {
+                // Dodanie powiązania
+                StudentGrupa::create([
+                    'nr_indeksu_s' => $studentIndex,
+                    'id_grupy' => $groupId,
+                ]);
+            }
+        }
+    }
+
+    echo "Dane dla studenta o numerze indeksu {$studentIndex} zostały zapisane.\n";
+}
+
+try {
+    $pdo = new PDO('mysql:host=localhost;dbname=ai_project', 'root', '', [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    ]);
+    ORM::setConnection($pdo);
+} catch (PDOException $e) {
+    die("Nie można połączyć się z bazą danych: " . $e->getMessage());
+}
 
 function main() {
-    $studentIndex = 51097;
-    $teachers = getTeachersFromAPI();
+    global $pdo;
+
     $start_date = "2025-01-01T00:00:00+02:00";
     $end_date = "2025-01-31T00:00:00+02:00";
 
-    $data = scrapeStudentData($studentIndex, $start_date, $end_date);
+    $teachers = getTeachersFromAPI();
 
 //    foreach ($teachers as $teacher) {
 //        $lessons = scrapeLessonData($teacher, $start_date, $end_date);
@@ -136,13 +167,19 @@ function main() {
 //            processLesson($lesson);
 //        }
 //    }
-    if (!empty($data)) {
-        processStudentData($studentIndex, $data);
-    } else {
-        echo "Brak danych dla studenta o numerze indeksu {$studentIndex}.\n";
+
+    for ($studentIndex = 51000; $studentIndex <= 54000; $studentIndex++) {
+        echo "Pobieranie danych dla studenta o numerze indeksu: {$studentIndex}\n";
+
+        $studentData = scrapeStudentData($studentIndex, $start_date, $end_date);
+
+        if (!empty($studentData)) {
+            processStudentData($studentIndex, $studentData);
+        } else {
+            echo "Brak danych dla studenta o numerze indeksu {$studentIndex}.\n";
+        }
     }
-
-
+    echo "Dane dla wszystkich studentów w zakresie indeksów zostały przetworzone.\n";
     echo "Dane zostały zapisane do bazy.\n";
 }
 

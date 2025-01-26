@@ -1,10 +1,7 @@
 <?php
 
-
-use Illuminate\Database\Eloquent\Model;
-
-class Przedmiot extends Model {
-    protected $table = 'przedmiot';
+class Przedmiot extends ORM {
+    protected static $table = 'przedmiot';
     protected $primaryKey = 'id_przedmiotu';
     public $timestamps = false;
 
