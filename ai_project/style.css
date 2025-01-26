@@ -627,4 +627,59 @@ body.dark #container #calendar-container .fc-scrollgrid {
 body.dark #container #calendar-container th {
   border: 1px solid #6c6c6c;
 }
+
+body.high-contrast {
+  background-color: #000;
+  color: #fff;
+}
+
+body.high-contrast a {
+  color: #ffff00;
+}
+
+body.high-contrast button {
+  background-color: #000;
+  color: #fff;
+  border: 2px solid #fff;
+}
+
+body.high-contrast #header-container {
+  background-color: #000;
+  color: #fff;
+  border-color: #fff;
+}
+
+body.high-contrast #container input {
+  background-color: #000;
+  color: #fff;
+  border: 2px solid #fff;
+}
+
+body.high-contrast #calendar-container .fc-event {
+  background-color: #ff0 !important;
+  color: #000 !important;
+}
+
+body.high-contrast .legend-color {
+  background-color: #ff0;
+  border: 2px solid #fff;
+}
+
+#accessibility-options button,
+#font-size-options button {
+  background-color: #2e419c;
+  color: #fff;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  margin-left: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#accessibility-options button:hover,
+#font-size-options button:hover {
+  background-color: #3449b0;
+}
+
 /*# sourceMappingURL=style.css.map */
