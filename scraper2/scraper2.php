@@ -3,11 +3,10 @@
 $config = [
     'host' => 'localhost',
     'dbname' => 'ai_project',
-    'user' => 'root', // Zastąp "username" swoim użytkownikiem
-    'password' => '', // Zastąp "password" swoim hasłem
+    'user' => 'root',
+    'password' => '',
 ];
 
-// Połączenie z bazą danych
 function getDatabaseConnection($config) {
     try {
         return new PDO(
@@ -21,7 +20,7 @@ function getDatabaseConnection($config) {
     }
 }
 
-// Wyszukiwanie nauczycieli z API
+// Pobieranie listy nauczycieli z API
 function getTeachersFromAPI() {
     $teachers = [];
     $alphabet = range('A', 'Z');
@@ -32,7 +31,6 @@ function getTeachersFromAPI() {
             $response = file_get_contents($url);
             $data = json_decode($response, true);
 
-            // Jeśli dane są tablicą obiektów, wyciągnij wartość z klucza 'item'
             if (is_array($data)) {
                 foreach ($data as $entry) {
                     if (isset($entry['item'])) {
@@ -48,115 +46,205 @@ function getTeachersFromAPI() {
     return array_unique($teachers); // Usunięcie duplikatów
 }
 
-// Scrape'owanie danych dla nauczyciela
-function scrapeTeacherSchedule($teacher, $start_date, $end_date) {
-    $url = "https://plan.zut.edu.pl/schedule_student.php?teacher=" . urlencode($teacher) . "&start={$start_date}&end={$end_date}";
+function saveTeachersToJson($teachers, $filename) {
     try {
-        $response = file_get_contents($url);
-        return json_decode($response, true);
+        $jsonData = json_encode($teachers, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        file_put_contents($filename, $jsonData);
+        echo "Lista nauczycieli została zapisana do pliku: {$filename}\n";
     } catch (Exception $e) {
-        echo "Błąd podczas pobierania danych dla nauczyciela {$teacher}: {$e->getMessage()}\n";
-        return null;
+        echo "Błąd podczas zapisywania danych do pliku JSON: " . $e->getMessage() . "\n";
     }
 }
 
-// Zapisywanie danych do bazy danych
-function saveToDatabase($data, $pdo)
-{
-    foreach ($data as $lesson) {
-        if (empty($lesson)) continue;
 
-        // Wyszukiwanie lub dodanie przedmiotu
-        $stmt = $pdo->prepare("INSERT INTO przedmiot (nazwa) VALUES (:nazwa) ON DUPLICATE KEY UPDATE id_przedmiotu = LAST_INSERT_ID(id_przedmiotu)");
-        $stmt->execute([':nazwa' => $lesson['subject']]);
-        $id_przedmiotu = $pdo->lastInsertId();
+// Pobieranie danych z API dla nauczyciela
+function scrapeLessonData($teacher, $start_date, $end_date) {
+    $url = "https://plan.zut.edu.pl/schedule_student.php?teacher=" . urlencode($teacher) . "&start={$start_date}&end={$end_date}";
+    try {
+        $response = file_get_contents($url);
+        $data = json_decode($response, true);
 
-        // Wyodrębnij nazwę budynku z nazwy sali
-        $building_name = null;
-        if (!empty($lesson['room'])) {
-            $building_name = explode(' ', $lesson['room'])[0]; // Przykładowe wyodrębnienie budynku z nazwy sali
+        if (!$data || !is_array($data)) {
+            echo "Błąd: API zwróciło pustą lub niepoprawną odpowiedź dla nauczyciela {$teacher}.\n";
+            return [];
         }
 
-// Wyszukiwanie lub dodanie budynku
-        $id_budynku = null;
-        if ($building_name) {
-            $stmt = $pdo->prepare("INSERT INTO budynek (nazwa) VALUES (:nazwa) ON DUPLICATE KEY UPDATE id_budynku = LAST_INSERT_ID(id_budynku)");
-            $stmt->execute([':nazwa' => $building_name]);
-            $id_budynku = $pdo->lastInsertId();
-        }
+        return $data;
+    } catch (Exception $e) {
+        echo "Błąd podczas pobierania danych z API dla nauczyciela {$teacher}: " . $e->getMessage() . "\n";
+        return [];
+    }
+}
 
-// Dodanie sali
-        if (!empty($lesson['room'])) {
-            $stmt = $pdo->prepare("INSERT INTO sala (nr_sali, id_budynku) VALUES (:nr_sali, :id_budynku) ON DUPLICATE KEY UPDATE id_sali = LAST_INSERT_ID(id_sali)");
-            $stmt->execute([':nr_sali' => $lesson['room'], ':id_budynku' => $id_budynku]);
-            $id_sali = $pdo->lastInsertId();
-        }
-        echo "Room: {$lesson['room']}, Building: {$building_name}\n";
+// Zapis grupy
+function saveGroupIfNotExists($pdo, $groupName) {
+    // Ustaw wartość domyślną dla grupy, jeśli brak nazwy
+    $groupName = $groupName ?: 'Nieznana grupa';
+
+    $sqlCheck = "SELECT id_grupy FROM grupa WHERE nazwa = ?";
+    $stmtCheck = $pdo->prepare($sqlCheck);
+    $stmtCheck->execute([$groupName]);
+    $id = $stmtCheck->fetchColumn();
+
+    if ($id) {
+        return $id;
+    }
+
+    $sqlInsert = "INSERT INTO grupa (nazwa) VALUES (?)";
+    $stmtInsert = $pdo->prepare($sqlInsert);
+    $stmtInsert->execute([$groupName]);
+
+    return $pdo->lastInsertId();
+}
 
 
-        // Wyszukiwanie lub dodanie grupy
-        if (!empty($lesson['group_name'])) {
-            $stmt = $pdo->prepare("INSERT INTO grupa (nazwa) VALUES (:nazwa) ON DUPLICATE KEY UPDATE id_grupy = LAST_INSERT_ID(id_grupy)");
-            $stmt->execute([':nazwa' => $lesson['group_name']]);
-            $id_grupy = $pdo->lastInsertId();
-        } else {
-            $id_grupy = null;
-        }
+// Zapis prowadzącego
+function saveTeacherIfNotExists($pdo, $worker) {
+    $workerParts = explode(' ', $worker);
+    $lastName = $workerParts[0] ?? 'Nieznane nazwisko';
+    $firstName = $workerParts[1] ?? 'Nieznane imię';
 
-        // Dodanie zajęć
-        // Dodanie zajęć
-        if (empty($id_grupy)) {
-            echo "Pomijanie zajęć bez przypisanej grupy\n";
-            continue; // Pomiń ten rekord, jeśli `id_grupy` jest wymagane
-        }
+    $formattedWorker = "{$lastName} {$firstName}";
 
-        $stmt = $pdo->prepare("
-    INSERT INTO zajecia (id_przedmiotu, forma, id_sali, id_grupy, godzina_od, godzina_do)
-    VALUES (:id_przedmiotu, :forma, :id_sali, :id_grupy, :godzina_od, :godzina_do)
-");
-        $stmt->execute([
-            ':id_przedmiotu' => $id_przedmiotu,
-            ':forma' => $lesson['lesson_form'] ?? 'nieznane',
-            ':id_sali' => $id_sali ?? null,
-            ':id_grupy' => $id_grupy,
-            ':godzina_od' => $lesson['start'],
-            ':godzina_do' => $lesson['end'],
+    $sqlCheck = "SELECT nr_indeksu_p FROM prowadzacy WHERE nazwisko_imie_p = ?";
+    $stmtCheck = $pdo->prepare($sqlCheck);
+    $stmtCheck->execute([$formattedWorker]);
+    $id = $stmtCheck->fetchColumn();
+
+    if ($id) {
+        return $id;
+    }
+
+    $sqlInsert = "INSERT INTO prowadzacy (nazwisko_imie_p) VALUES (?)";
+    $stmtInsert = $pdo->prepare($sqlInsert);
+    $stmtInsert->execute([$formattedWorker]);
+
+    return $pdo->lastInsertId();
+}
+
+// Zapis przedmiotu
+function saveSubjectIfNotExists($pdo, $subjectName) {
+    $sqlCheck = "SELECT id_przedmiotu FROM przedmiot WHERE nazwa = ?";
+    $stmtCheck = $pdo->prepare($sqlCheck);
+    $stmtCheck->execute([$subjectName]);
+    $id = $stmtCheck->fetchColumn();
+
+    if ($id) {
+        return $id;
+    }
+
+    $sqlInsert = "INSERT INTO przedmiot (nazwa) VALUES (?)";
+    $stmtInsert = $pdo->prepare($sqlInsert);
+    $stmtInsert->execute([$subjectName]);
+
+    return $pdo->lastInsertId();
+}
+
+// Przypisanie przedmiotu do prowadzącego
+function saveSubjectTeacherRelation($pdo, $subjectId, $teacherId) {
+    $sqlCheck = "SELECT 1 FROM przedmiot_prowadzacy WHERE id_przedmiotu = ? AND nr_indeksu_p = ?";
+    $stmtCheck = $pdo->prepare($sqlCheck);
+    $stmtCheck->execute([$subjectId, $teacherId]);
+
+    if ($stmtCheck->fetchColumn()) {
+        return;
+    }
+
+    $sqlInsert = "INSERT INTO przedmiot_prowadzacy (id_przedmiotu, nr_indeksu_p) VALUES (?, ?)";
+    $stmtInsert = $pdo->prepare($sqlInsert);
+    $stmtInsert->execute([$subjectId, $teacherId]);
+}
+
+// Zapis sali
+function saveRoomIfNotExists($pdo, $roomName) {
+    $sqlCheck = "SELECT id_sali FROM sala WHERE nr_sali = ?";
+    $stmtCheck = $pdo->prepare($sqlCheck);
+    $stmtCheck->execute([$roomName]);
+    $id = $stmtCheck->fetchColumn();
+
+    if ($id) {
+        return $id;
+    }
+
+    $sqlInsert = "INSERT INTO sala (nr_sali) VALUES (?)";
+    $stmtInsert = $pdo->prepare($sqlInsert);
+    $stmtInsert->execute([$roomName]);
+
+    return $pdo->lastInsertId();
+}
+
+// Zapis zajęć
+function saveLesson($pdo, $data) {
+    $sql = "INSERT INTO zajecia (id_przedmiotu, forma, id_sali, id_grupy, godzina_od, godzina_do) 
+            VALUES (?, ?, ?, ?, ?, ?)";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([
+        $data['id_przedmiotu'],
+        $data['forma'],
+        $data['id_sali'],
+        $data['id_grupy'],
+        substr($data['godzina_od'], 11, 8),
+        substr($data['godzina_do'], 11, 8)
+    ]);
+}
+
+// Główna funkcja zapisująca lekcję
+function processLesson($pdo, $lesson) {
+    // Debugowanie danych wejściowych
+    echo "Przetwarzanie lekcji:\n";
+
+    // Walidacja i uzupełnianie danych
+    $lesson['group_name'] = $lesson['group_name'] ?? 'null';
+    $lesson['worker'] = $lesson['worker'] ?? 'null';
+    $lesson['subject'] = $lesson['subject'] ?? 'null';
+    $lesson['room'] = $lesson['room'] ?? 'null';
+    $lesson['lesson_form'] = $lesson['lesson_form'] ?? 'null';
+    $lesson['start'] = $lesson['start'] ?? 'null';
+    $lesson['end'] = $lesson['end'] ?? 'null';
+
+    try {
+        $groupId = saveGroupIfNotExists($pdo, $lesson['group_name']);
+        $teacherId = saveTeacherIfNotExists($pdo, $lesson['worker']);
+        $subjectId = saveSubjectIfNotExists($pdo, $lesson['subject']);
+        saveSubjectTeacherRelation($pdo, $subjectId, $teacherId);
+        $roomId = saveRoomIfNotExists($pdo, $lesson['room']);
+
+        saveLesson($pdo, [
+            'id_przedmiotu' => $subjectId,
+            'forma' => $lesson['lesson_form'],
+            'id_sali' => $roomId,
+            'id_grupy' => $groupId,
+            'godzina_od' => $lesson['start'],
+            'godzina_do' => $lesson['end']
         ]);
+    } catch (PDOException $e) {
+        echo "Błąd przy zapisie danych:\n";
+        print_r($lesson);
+        echo "Błąd SQL: " . $e->getMessage() . "\n";
     }
 }
 
 
 // Główna funkcja
-function main($config) {
+function main() {
+    global $config;
+
     $pdo = getDatabaseConnection($config);
 
-    // Pobranie listy nauczycieli z API
-    echo "Pobieranie listy nauczycieli...\n";
     $teachers = getTeachersFromAPI();
-    echo "Znaleziono nauczycieli: " . count($teachers) . "\n";
-//    print_r($teachers);
 
-    file_put_contents('teachers.json', json_encode($teachers, JSON_PRETTY_PRINT));
-    echo "Lista nauczycieli została zapisana w pliku teachers.json\n";
+    $start_date = "2025-01-01T00:00:00+02:00";
+    $end_date = "2025-01-31T00:00:00+02:00";
 
-
-    $start_date = "2024-09-01T00:00:00+02:00";
-    $end_date = "2025-02-28T23:59:59+02:00";
-
-    // Scrape'owanie danych dla każdego nauczyciela
     foreach ($teachers as $teacher) {
-        echo "Pobieranie danych dla nauczyciela: {$teacher}\n";
-        $schedule = scrapeTeacherSchedule($teacher, $start_date, $end_date);
-        if ($schedule) {
-            saveToDatabase($schedule, $pdo);
-        } else {
-            echo "Brak danych dla nauczyciela: {$teacher}\n";
+        print_r($teacher."\n");
+        $lessons = scrapeLessonData($teacher, $start_date, $end_date);
+        foreach ($lessons as $lesson) {
+            processLesson($pdo, $lesson);
         }
-        sleep(2); // Pauza, aby uniknąć przekroczenia limitów API
     }
 
-    echo "Zakończono scrape'owanie danych.\n";
+    echo "Dane dla wszystkich nauczycieli zostały zapisane do bazy danych.\n";
 }
 
-// Uruchomienie skryptu
-main($config);
+main();
