@@ -7,6 +7,8 @@ require 'PrzedmiotProwadzacy.php';
 require 'Grupa.php';
 require 'Sala.php';
 require 'Zajecia.php';
+require 'Student.php';
+require 'StudentGrupa.php';
 
 function getTeachersFromAPI() {
     $teachers = [];
@@ -33,6 +35,29 @@ function getTeachersFromAPI() {
     return array_unique($teachers);
 }
 
+function scrapeStudentData($studentIndex, $start_date, $end_date) {
+    $url = "https://plan.zut.edu.pl/schedule_student.php?number={$studentIndex}&start={$start_date}&end={$end_date}";
+    echo "URL API: {$url}\n"; // Debugowanie URL
+    try {
+        $response = file_get_contents($url);
+        $data = json_decode($response, true);
+
+        if (!$data || !is_array($data)) {
+            echo "Błąd: API zwróciło pustą odpowiedź dla numeru indeksu {$studentIndex}.\n";
+            return [];
+        }
+
+        return $data;
+    } catch (Exception $e) {
+        echo "Błąd podczas pobierania danych z API dla numeru indeksu {$studentIndex}: " . $e->getMessage() . "\n";
+        return [];
+    }
+}
+
+
+
+
+
 function scrapeLessonData($teacher, $start_date, $end_date) {
     $url = "https://plan.zut.edu.pl/schedule_student.php?teacher=" . urlencode($teacher) . "&start={$start_date}&end={$end_date}";
     try {
@@ -50,6 +75,28 @@ function scrapeLessonData($teacher, $start_date, $end_date) {
         return [];
     }
 }
+
+function processStudentData($studentIndex, $data) {
+    // Zapis studenta
+    $student = Student::firstOrCreate(['nr_indeksu_s' => $studentIndex]);
+
+    // Iteracja po danych i zapis grup
+    foreach ($data as $lesson) {
+        if (isset($lesson['group_name'])) {
+            // Znajdź lub utwórz grupę
+            $grupa = Grupa::firstOrCreate(['nazwa' => $lesson['group_name']]);
+
+            // Zapis powiązania studenta z grupą
+            StudentGrupa::firstOrCreate([
+                'nr_indeksu_s' => $student->nr_indeksu_s,
+                'id_grupy' => $grupa->id_grupy,
+            ]);
+        }
+    }
+
+    echo "Dane dla studenta o numerze indeksu {$studentIndex} zostały zapisane.\n";
+}
+
 
 function processLesson($lesson) {
     $grupa = Grupa::firstOrCreate(['nazwa' => $lesson['group_name'] ?? 'null']);
@@ -72,18 +119,29 @@ function processLesson($lesson) {
     ]);
 }
 
+
+
 function main() {
+    $studentIndex = 51097;
     $teachers = getTeachersFromAPI();
-    $start_date = "2024-09-30T00:00:00+02:00";
-    $end_date = "2024-10-07T00:00:00+02:00";
+    $start_date = "2025-01-01T00:00:00+02:00";
+    $end_date = "2025-01-31T00:00:00+02:00";
 
-    foreach ($teachers as $teacher) {
-        $lessons = scrapeLessonData($teacher, $start_date, $end_date);
+    $data = scrapeStudentData($studentIndex, $start_date, $end_date);
 
-        foreach ($lessons as $lesson) {
-            processLesson($lesson);
-        }
+//    foreach ($teachers as $teacher) {
+//        $lessons = scrapeLessonData($teacher, $start_date, $end_date);
+//
+//        foreach ($lessons as $lesson) {
+//            processLesson($lesson);
+//        }
+//    }
+    if (!empty($data)) {
+        processStudentData($studentIndex, $data);
+    } else {
+        echo "Brak danych dla studenta o numerze indeksu {$studentIndex}.\n";
     }
+
 
     echo "Dane zostały zapisane do bazy.\n";
 }

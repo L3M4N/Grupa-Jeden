@@ -29,4 +29,6 @@ class Zajecia extends Model {
         return $this->belongsTo(Sala::class, 'id_sali', 'id_sali');
     }
 
+
+
 }

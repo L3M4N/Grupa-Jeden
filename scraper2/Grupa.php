@@ -13,4 +13,9 @@ class Grupa extends Model {
     public function zajecia() {
         return $this->hasMany(Zajecia::class, 'id_grupy', 'id_grupy');
     }
+
+    public function studentGrupy() {
+        return $this->hasMany(StudentGrupa::class, 'id_grupy', 'id_grupy');
+    }
+
 }
